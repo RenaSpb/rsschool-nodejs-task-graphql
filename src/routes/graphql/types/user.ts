@@ -30,25 +30,21 @@ export const UserType = new GraphQLObjectType({
         userSubscribedTo: {
             type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
             resolve: async (user, _, { prisma }) => {
-                return prisma.user.findMany({
-                    where: {
-                        subscribedByUsers: {
-                            some: { id: user.id }
-                        }
-                    }
+                const subscriptions = await prisma.subscribersOnAuthors.findMany({
+                    where: { subscriberId: user.id },
+                    include: { author: true }
                 });
+                return subscriptions.map(sub => sub.author);
             }
         },
         subscribedToUser: {
             type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
             resolve: async (user, _, { prisma }) => {
-                return prisma.user.findMany({
-                    where: {
-                        subscribedToUsers: {
-                            some: { id: user.id }
-                        }
-                    }
+                const subscriptions = await prisma.subscribersOnAuthors.findMany({
+                    where: { authorId: user.id },
+                    include: { subscriber: true }
                 });
+                return subscriptions.map(sub => sub.subscriber);
             }
         }
     })
