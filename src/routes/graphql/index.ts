@@ -24,7 +24,6 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
           variables?: Record<string, unknown>
         };
 
-        // Проверяем глубину запроса
         const documentAST = parse(query);
         const validationErrors = validate(schema, documentAST, [depthLimit(5)]);
 
